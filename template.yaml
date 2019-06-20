@@ -1,0 +1,44 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+    Sample SAM Template
+    
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+    Function:
+        Timeout: 15
+        MemorySize: 850
+
+
+Resources:
+    ############ LAYERS #############
+    GeneralPuppeteerLayer:
+        Type: AWS::Serverless::LayerVersion
+        Properties:
+            LayerName: GeneralPuppeteerLayer
+            Description: Hold Puppeteer library and node modules
+            ContentUri: dependencies/
+            CompatibleRuntimes:
+                - nodejs8.10
+            RetentionPolicy: Delete
+
+    HelpersAndUtilsLayer:
+        Type: AWS::Serverless::LayerVersion
+        Properties:
+            LayerName: CoderHelpersAndUtilsLayer
+            Description: Holds helper functions for application
+            ContentUri: src/utilities_layer/
+            CompatibleRuntimes:
+                - nodejs8.10
+            RetentionPolicy: Delete
+            
+    ############ LAMBDA FUNCTIONS #############
+    HelloWorld:
+        Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+        Properties:
+            CodeUri: src/functions/
+            Handler: example.lambdaHandler
+            Runtime: nodejs8.10
+            Layers: 
+                - !Ref GeneralPuppeteerLayer
+                - !Ref HelpersAndUtilsLayer
